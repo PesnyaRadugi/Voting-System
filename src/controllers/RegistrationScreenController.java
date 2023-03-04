@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import models.DbHandler;
+import models.User;
 
 public class RegistrationScreenController {
 
@@ -14,9 +16,6 @@ public class RegistrationScreenController {
 
     @FXML
     private URL location;
-
-    @FXML
-    private Button loginButton;
 
     @FXML
     private TextField loginField;
@@ -28,12 +27,16 @@ public class RegistrationScreenController {
     private PasswordField passwordField;
 
     @FXML
-    void initialize() {
-        assert loginButton != null : "fx:id=\"loginButton\" was not injected: check your FXML file 'RegistrationScreen.fxml'.";
-        assert loginField != null : "fx:id=\"loginField\" was not injected: check your FXML file 'RegistrationScreen.fxml'.";
-        assert nameField != null : "fx:id=\"nameField\" was not injected: check your FXML file 'RegistrationScreen.fxml'.";
-        assert passwordField != null : "fx:id=\"passwordField\" was not injected: check your FXML file 'RegistrationScreen.fxml'.";
+    private Button registerButton;
 
+    @FXML
+    void initialize() {
+
+        DbHandler dbHandler = new DbHandler();
+
+        registerButton.setOnAction(event -> {
+            dbHandler.RegistrateUser(new User(nameField.getText(), loginField.getText(), passwordField.getText()));
+        });
     }
 
 }

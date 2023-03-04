@@ -10,6 +10,7 @@
         "d:\\javafx-sdk-17.0.6\\lib\\javafx.media.jar",
         "d:\\javafx-sdk-17.0.6\\lib\\javafx.swing.jar",
         "d:\\javafx-sdk-17.0.6\\lib\\javafx.web.jar",
-        "d:\\javafx-sdk-17.0.6\\lib\\javafx-swt.jar"
+        "d:\\javafx-sdk-17.0.6\\lib\\javafx-swt.jar",
+        "c:\\Program Files (x86)\\MySQL\\Connector J 8.0\\mysql-connector-j-8.0.32.jar"
     ]
 }

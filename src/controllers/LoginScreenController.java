@@ -44,6 +44,18 @@ public class LoginScreenController {
                 e.printStackTrace();
             }
         });
+
+        loginButton.setOnAction(event -> {
+            String loginText = loginField.getText().trim();
+            String loginPassword = passwordField.getText().trim();
+
+            if (!loginText.isEmpty() && !loginPassword.isEmpty()) {
+                LoginUser(loginText, loginPassword);
+            }
+            else {
+                System.out.println("Fields are empty");
+            }
+        });
     }
 
     @FXML
@@ -59,4 +71,7 @@ public class LoginScreenController {
         stage.show();
     }
 
+    private void LoginUser(String loginText, String loginPassword) {
+        
+    }
 }
