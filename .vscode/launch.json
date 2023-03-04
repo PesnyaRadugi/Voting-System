@@ -12,11 +12,11 @@
         },
         {
             "type": "java",
-            "name": "App",
+            "name": "VotingSytem",
             "request": "launch",
-            "mainClass": "App",
+            "mainClass": "models.VotingSytem",
             "projectName": "Voting System_4af2f5c1",
-            "vmArgs": "--module-path D:/javafx-sdk-17.0.6/lib --add-modules javafx.controls,javafx.fxml",
+            "vmArgs": "--module-path D:/javafx-sdk-17.0.6/lib --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }
