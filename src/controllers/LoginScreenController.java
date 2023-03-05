@@ -1,20 +1,17 @@
 package controllers;
 
-import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
-
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import models.DbHandler;
+import models.User;
 
-public class LoginScreenController {
+public class LoginScreenController extends ControllerBase {
 
     @FXML
     private ResourceBundle resources;
@@ -37,9 +34,8 @@ public class LoginScreenController {
     @FXML
     private void initialize() {
         loginScreenRegisterButton.setOnAction(event -> {
-            loginScreenRegisterButton.getScene().getWindow().hide();
             try {
-                openRegistrationScreen(event);
+                openNewScene(loginScreenRegisterButton, "/views/RegistrationScreen.fxml");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -50,7 +46,7 @@ public class LoginScreenController {
             String loginPassword = passwordField.getText().trim();
 
             if (!loginText.isEmpty() && !loginPassword.isEmpty()) {
-                LoginUser(loginText, loginPassword);
+                loginUser(loginText, loginPassword);
             }
             else {
                 System.out.println("Fields are empty");
@@ -58,20 +54,20 @@ public class LoginScreenController {
         });
     }
 
-    @FXML
-    private void openRegistrationScreen(ActionEvent event) throws IOException
-    {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/RegistrationScreen.fxml"));
-        Parent root = loader.load();
-        // RegistrationScreenController registrationScreenController = loader.getController();
+    private void loginUser(String loginText, String loginPassword) {
+        DbHandler dbHandler = new DbHandler();
+        User user = new User();
+        user.setLogin(loginText);
+        user.setPassword(loginPassword);
+        ResultSet resultset = dbHandler.getUser(user);
 
-        Stage stage = new Stage();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Registration Screen");
-        stage.show();
-    }
-
-    private void LoginUser(String loginText, String loginPassword) {
-        
+        try {
+            if (resultset.next()) {
+                System.out.println("HUGE SUCCES");
+                openNewScene(loginButton, "/views/Homepage.fxml");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

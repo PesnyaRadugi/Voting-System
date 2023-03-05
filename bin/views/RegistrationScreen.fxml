@@ -13,7 +13,7 @@
    <children>
       <Text fill="WHITE" layoutX="129.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Registration Screen">
          <font>
-            <Font size="40.0" />
+            <Font name="Comic Sans MS" size="40.0" />
          </font>
       </Text>
       <AnchorPane layoutY="100.0" prefHeight="300.0" prefWidth="600.0" style="-fx-background-color: #fafafa;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
@@ -22,7 +22,7 @@
                <children>
                   <TextField fx:id="nameField" layoutX="110.0" layoutY="76.0" promptText="Name">
                      <font>
-                        <Font size="20.0" />
+                        <Font name="Comic Sans MS" size="20.0" />
                      </font>
                      <VBox.margin>
                         <Insets bottom="10.0" left="100.0" right="100.0" top="25.0" />
@@ -33,7 +33,7 @@
                         <Insets bottom="10.0" left="100.0" right="100.0" top="25.0" />
                      </VBox.margin>
                      <font>
-                        <Font size="20.0" />
+                        <Font name="Comic Sans MS" size="20.0" />
                      </font>
                   </TextField>
                   <PasswordField fx:id="passwordField" promptText="Password">
@@ -41,17 +41,25 @@
                         <Insets bottom="10.0" left="100.0" right="100.0" top="25.0" />
                      </VBox.margin>
                      <font>
-                        <Font size="20.0" />
+                        <Font name="Comic Sans MS" size="20.0" />
                      </font>
                   </PasswordField>
                   <Button fx:id="registerButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" text="Register">
                      <VBox.margin>
                         <Insets top="5.0" />
                      </VBox.margin>
+                     <font>
+                        <Font name="Comic Sans MS" size="20.0" />
+                     </font>
                   </Button>
                </children>
             </VBox>
          </children>
       </AnchorPane>
+      <Button fx:id="goBackButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="75.0" text="fck go back">
+         <font>
+            <Font name="Comic Sans MS" size="11.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

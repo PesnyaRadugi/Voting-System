@@ -9,13 +9,16 @@ import javafx.scene.control.TextField;
 import models.DbHandler;
 import models.User;
 
-public class RegistrationScreenController {
+public class RegistrationScreenController extends ControllerBase {
 
     @FXML
     private ResourceBundle resources;
 
     @FXML
     private URL location;
+
+    @FXML
+    private Button goBackButton;
 
     @FXML
     private TextField loginField;
@@ -35,7 +38,17 @@ public class RegistrationScreenController {
         DbHandler dbHandler = new DbHandler();
 
         registerButton.setOnAction(event -> {
-            dbHandler.RegistrateUser(new User(nameField.getText(), loginField.getText(), passwordField.getText()));
+            if (!nameField.getText().isEmpty() && !loginField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
+                dbHandler.RegistrateUser(new User(nameField.getText(), loginField.getText(), passwordField.getText()));
+                openNewScene(registerButton, "/views/Homepage.fxml");
+            }
+            else {
+                System.out.println("Some fields are empty");
+            }
+        });
+
+        goBackButton.setOnAction(event -> {
+            openNewScene(goBackButton, "/views/LoginScreen.fxml");
         });
     }
 

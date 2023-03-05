@@ -2,14 +2,10 @@ package controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
-public class HomepageController {
+public class HomepageController extends ControllerBase {
 
     @FXML
     private ResourceBundle resources;
