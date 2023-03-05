@@ -40,7 +40,7 @@ public class RegistrationScreenController extends ControllerBase {
         registerButton.setOnAction(event -> {
             if (!nameField.getText().isEmpty() && !loginField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
                 dbHandler.RegistrateUser(new User(nameField.getText(), loginField.getText(), passwordField.getText()));
-                openNewScene(registerButton, "/views/Homepage.fxml");
+                switchScene(registerButton, "/views/Homepage.fxml");
             }
             else {
                 System.out.println("Some fields are empty");
@@ -48,7 +48,7 @@ public class RegistrationScreenController extends ControllerBase {
         });
 
         goBackButton.setOnAction(event -> {
-            openNewScene(goBackButton, "/views/LoginScreen.fxml");
+            switchScene(goBackButton, "/views/LoginScreen.fxml");
         });
     }
 
