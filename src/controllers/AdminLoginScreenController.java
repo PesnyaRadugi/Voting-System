@@ -9,14 +9,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import models.Admin;
 import models.Const;
 import models.DbHandler;
-import models.User;
 
-public class LoginScreenController extends ControllerBase {
-
-    @FXML
-    private Button adminScreenButton;
+public class AdminLoginScreenController extends ControllerBase {
 
     @FXML
     private ResourceBundle resources;
@@ -31,57 +28,44 @@ public class LoginScreenController extends ControllerBase {
     private TextField loginField;
 
     @FXML
-    private Button loginScreenRegisterButton;
-
-    @FXML
     private PasswordField passwordField;
 
     @FXML
-    private void initialize() {
-        loginScreenRegisterButton.setOnAction(event -> {
-            try {
-                switchScene(loginScreenRegisterButton, Const.REGISTRATION_SCREEN);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
+    void initialize() {
         loginButton.setOnAction(event -> {
-            loginUser(event);
-        });
-
-        adminScreenButton.setOnAction(event -> {
             try {
-                switchScene(adminScreenButton, Const.ADMIN_LOGIN_SCREEN);
+                loginAdmin(event);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private void loginUser(ActionEvent event) {
+    private void loginAdmin(ActionEvent event) {
         String loginText = loginField.getText().trim();
         String loginPassword = passwordField.getText();
-        
+
         if (!loginText.isEmpty() && !loginPassword.isEmpty()) {
             DbHandler dbHandler = new DbHandler();
-            User user = new User();
-            user.setLogin(loginText);
-            user.setPassword(loginPassword);
-            ResultSet resultset = dbHandler.getUser(user);
+            Admin admin = new Admin();
+            admin.setLogin(loginText);
+            admin.setPassword(loginPassword);
+            ResultSet resultSet = dbHandler.getAdmin(admin);
 
             try {
-                if (resultset.next()) {
-                    System.out.println("HUGE SUCCES");
-                    switchScene(loginButton, Const.HOMEPAGE);
+                if (resultSet.next()) {
+                    switchScene(loginButton, Const.ADMIN_PANEL);
+                }
+                else {
+                    System.out.println("Kekw");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
         else {
-            System.out.println("Fields are empty");
+            System.out.println("Aboba");
         }
-
     }
+
 }

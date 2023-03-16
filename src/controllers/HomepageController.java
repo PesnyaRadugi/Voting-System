@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import models.Const;
 
 public class HomepageController extends ControllerBase {
 
@@ -26,8 +27,7 @@ public class HomepageController extends ControllerBase {
     @FXML
     void initialize() {
         exitButton.setOnAction(event -> {
-            switchScene(menuButton, "/views/LoginScreen.fxml");
-            System.out.println("cock");
+            switchScene(menuButton, Const.LOGIN_SCREEN);
         });
         
     }
