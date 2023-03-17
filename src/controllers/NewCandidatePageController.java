@@ -25,10 +25,7 @@ public class NewCandidatePageController {
 
     @FXML
     void initialize() {
-        assert createCandidateButton != null : "fx:id=\"createCandidateButton\" was not injected: check your FXML file 'NewCandidatePage.fxml'.";
-        assert goBackButton != null : "fx:id=\"goBackButton\" was not injected: check your FXML file 'NewCandidatePage.fxml'.";
-        assert nameField != null : "fx:id=\"nameField\" was not injected: check your FXML file 'NewCandidatePage.fxml'.";
-
+        
     }
 
 }

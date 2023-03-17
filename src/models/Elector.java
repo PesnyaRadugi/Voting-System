@@ -9,6 +9,6 @@ public class Elector extends User {
     }
 
     private void vote() {
-        // IDK 
+        voted = true;
     }
 }

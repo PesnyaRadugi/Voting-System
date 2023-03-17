@@ -2,12 +2,13 @@ package controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import models.Const;
-import models.DbHandler;
 import models.User;
 
 public class RegistrationScreenController extends ControllerBase {
@@ -35,11 +36,8 @@ public class RegistrationScreenController extends ControllerBase {
 
     @FXML
     void initialize() {
-
-        DbHandler dbHandler = new DbHandler();
-
         registerButton.setOnAction(event -> {
-            signUpUser(dbHandler);
+            signUpUser();
         });
 
         goBackButton.setOnAction(event -> {
@@ -47,9 +45,9 @@ public class RegistrationScreenController extends ControllerBase {
         });
     }
 
-    private void signUpUser(DbHandler dbHandler) {
+    private void signUpUser() {
         if (!nameField.getText().isEmpty() && !loginField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
-            dbHandler.createNewUser(new User(nameField.getText(), loginField.getText(), passwordField.getText()));
+            DAO.insertUser(new User(nameField.getText(), loginField.getText(), passwordField.getText()));
             switchScene(registerButton, Const.HOMEPAGE);
         }
         else {

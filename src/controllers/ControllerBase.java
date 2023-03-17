@@ -7,8 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import models.MySQL;
+import models.SQL;
 
 public abstract class ControllerBase {
+
+    protected SQL DAO = new MySQL();
 
     // Opens a new window on top of previous
     protected void openNewScene(Button button, String window) {

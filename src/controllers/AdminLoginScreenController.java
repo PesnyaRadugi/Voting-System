@@ -11,7 +11,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import models.Admin;
 import models.Const;
-import models.DbHandler;
 
 public class AdminLoginScreenController extends ControllerBase {
 
@@ -33,11 +32,7 @@ public class AdminLoginScreenController extends ControllerBase {
     @FXML
     void initialize() {
         loginButton.setOnAction(event -> {
-            try {
-                loginAdmin(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            loginAdmin(event);
         });
     }
 
@@ -46,15 +41,15 @@ public class AdminLoginScreenController extends ControllerBase {
         String loginPassword = passwordField.getText();
 
         if (!loginText.isEmpty() && !loginPassword.isEmpty()) {
-            DbHandler dbHandler = new DbHandler();
             Admin admin = new Admin();
             admin.setLogin(loginText);
             admin.setPassword(loginPassword);
-            ResultSet resultSet = dbHandler.getAdmin(admin);
+            ResultSet resultSet = DAO.selectAdmin(admin);
 
             try {
                 if (resultSet.next()) {
                     switchScene(loginButton, Const.ADMIN_PANEL);
+                    DAO.closeConnection();
                 }
                 else {
                     System.out.println("Kekw");

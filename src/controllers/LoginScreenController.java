@@ -4,13 +4,11 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import models.Const;
-import models.DbHandler;
 import models.User;
 
 public class LoginScreenController extends ControllerBase {
@@ -47,7 +45,7 @@ public class LoginScreenController extends ControllerBase {
         });
 
         loginButton.setOnAction(event -> {
-            loginUser(event);
+            loginUser();
         });
 
         adminScreenButton.setOnAction(event -> {
@@ -59,21 +57,21 @@ public class LoginScreenController extends ControllerBase {
         });
     }
 
-    private void loginUser(ActionEvent event) {
+    private void loginUser() {
         String loginText = loginField.getText().trim();
         String loginPassword = passwordField.getText();
         
         if (!loginText.isEmpty() && !loginPassword.isEmpty()) {
-            DbHandler dbHandler = new DbHandler();
             User user = new User();
             user.setLogin(loginText);
             user.setPassword(loginPassword);
-            ResultSet resultset = dbHandler.getUser(user);
+            ResultSet resultset = DAO.selectUser(user);
 
             try {
                 if (resultset.next()) {
                     System.out.println("HUGE SUCCES");
                     switchScene(loginButton, Const.HOMEPAGE);
+                    DAO.closeConnection();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
