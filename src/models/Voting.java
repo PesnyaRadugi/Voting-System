@@ -12,7 +12,28 @@ public class Voting {
         this.candidates = candidates;
     }
 
+    public Voting() {
+    }
+
+    public Voting(String title) {
+        this.title = title;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public List<Candidate> getCandidates() {
+        return candidates;
+    }
+
+    public List<String> getCandidatesNames() {
+        List<String> candidatesNames = new ArrayList<>();
+
+        for (Candidate candidate : candidates) {
+            candidatesNames.add(candidate.getName());
+        }
+
+        return candidatesNames;
     }
 }
