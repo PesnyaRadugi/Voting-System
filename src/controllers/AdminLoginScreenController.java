@@ -1,8 +1,6 @@
 package controllers;
 
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -44,21 +42,13 @@ public class AdminLoginScreenController extends ControllerBase {
             Admin admin = new Admin();
             admin.setLogin(loginText);
             admin.setPassword(loginPassword);
-            ResultSet resultSet = DAO.selectAdmin(admin);
 
-            try {
-                if (resultSet.next()) {
-                    switchScene(loginButton, Const.ADMIN_PANEL);
-                    DAO.closeConnection();
-                }
-                else {
-                    System.out.println("Kekw");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (DAO.selectAdmin(admin) != null) {
+                switchScene(loginButton, Const.ADMIN_PANEL);
+            } else {
+                System.out.println("Kekw");
             }
-        }
-        else {
+        } else {
             System.out.println("Aboba");
         }
     }

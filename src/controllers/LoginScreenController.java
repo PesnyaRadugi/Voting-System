@@ -1,8 +1,6 @@
 package controllers;
 
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -65,19 +63,13 @@ public class LoginScreenController extends ControllerBase {
             User user = new User();
             user.setLogin(loginText);
             user.setPassword(loginPassword);
-            ResultSet resultset = DAO.selectUser(user);
 
-            try {
-                if (resultset.next()) {
-                    System.out.println("HUGE SUCCES");
-                    switchScene(loginButton, Const.HOMEPAGE);
-                    DAO.closeConnection();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (DAO.selectUser(user) != null) {
+                System.out.println("HUGE SUCCES");
+                switchScene(loginButton, Const.HOMEPAGE);
             }
-        }
-        else {
+
+        } else {
             System.out.println("Fields are empty");
         }
 

@@ -17,6 +17,7 @@ public class Voting {
 
     public Voting(String title) {
         this.title = title;
+        candidates = null;
     }
 
     public String getTitle() {
@@ -35,5 +36,9 @@ public class Voting {
         }
 
         return candidatesNames;
+    }
+
+    public void setCandidates(List<Candidate> candidates) {
+        this.candidates = candidates;
     }
 }

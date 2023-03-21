@@ -13,11 +13,10 @@ public class VotingSytem extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/views/LoginScreen.fxml"));
-    
-        Scene scene = new Scene(root, 600, 400);
-    
-        stage.setTitle("FXML Welcome");
+        Parent root = FXMLLoader.load(getClass().getResource(Const.ADMIN_PANEL));
+        Scene scene = new Scene(root);
+        
+        stage.setTitle("Voting System");
         stage.setScene(scene);
         stage.show();
     }

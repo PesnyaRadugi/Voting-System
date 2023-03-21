@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.sql.ResultSet;
 
 public class MySQL implements SQL {
@@ -43,8 +44,7 @@ public class MySQL implements SQL {
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             closeConnection();
         }
     }
@@ -62,24 +62,18 @@ public class MySQL implements SQL {
             preparedStatement.setString(3, user.getPassword());
 
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } 
-        finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } finally {
+            closeConnection();
         }
     }
 
     @Override
-    public ResultSet selectUser(User user) {
+    public User selectUser(User user) {
+        User selectedUser = null;
         ResultSet resultSet = null;
-
+        
         String select = "SELECT * FROM " + Const.USER_TABLE + " WHERE " +
                 Const.USERS_USERNAME + "=? AND " + Const.USERS_PASSWORD + "=?";
 
@@ -89,13 +83,16 @@ public class MySQL implements SQL {
             preparedStatement.setString(2, user.getPassword());
         
             resultSet = preparedStatement.executeQuery();
-        } catch (SQLException e) {
+            resultSet.next();
+            selectedUser = new User(resultSet.getString(Const.USERS_NAME), resultSet.getString(Const.USERS_USERNAME), resultSet.getString(Const.USERS_PASSWORD));
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } finally {
+            closeConnection();
         }
 
-        return resultSet;
+        return selectedUser;
+        
     }
 
     @Override
@@ -113,14 +110,8 @@ public class MySQL implements SQL {
         } 
         catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }
-        finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        } finally {
+            closeConnection();
         }
     }
 
@@ -147,7 +138,8 @@ public class MySQL implements SQL {
     }
     
     @Override
-    public ResultSet selectAllCandidates() {
+    public List<Candidate> selectAllCandidates() {
+        List<Candidate> candidates = new ArrayList<>();
         ResultSet resultSet = null;
 
         String select = "SELECT * FROM " + Const.CANDIDATE_TABLE;
@@ -155,13 +147,18 @@ public class MySQL implements SQL {
             PreparedStatement preparedStatement = connect().prepareStatement(select);
         
             resultSet = preparedStatement.executeQuery();
-        } catch (SQLException e) {
+            
+            while (resultSet.next()) {
+                candidates.add(new Candidate(resultSet.getString(Const.CANDIDATES_NAME)));
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } finally {
+            closeConnection();
         }
 
-        return resultSet;
+        return candidates;
     }
     
     @Override
@@ -169,18 +166,30 @@ public class MySQL implements SQL {
         String insert = "INSERT INTO " + Const.VOTING_CANDIDATES_LIST_TABLE + " (" +
                 Const.VOTING_CANDIDATE_LIST_VOTINGID + "," + Const.VOTING_CANDIDATE_LIST_CANDIDATEID + ","
                 + Const.VOTING_CANDIDATE_LIST_CANDIDATENAME + "," + Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES + ") VALUES(?,?,?,?)";
+        
+        String selectVotingId = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE " +
+                Const.VOTINGS_NAME + " =?";    
+
+        String selectCandidateId = "SELECT " + Const.CANDIDATES_ID + " FROM " + Const.CANDIDATE_TABLE + " WHERE " +
+                Const.CANDIDATES_NAME + " =?";       
+        
         try {
-            ResultSet resultSet;
+            PreparedStatement preparedStatement;
+            ResultSet resultSet;  
             
-            resultSet = selectVoting(voting);
+            preparedStatement = connect().prepareStatement(selectVotingId);
+            preparedStatement.setString(1, voting.getTitle());
+            resultSet = preparedStatement.executeQuery();
             resultSet.next();
             int votingId = resultSet.getInt(Const.VOTINGS_ID);
 
-            resultSet = selectCandidate(candidate);
+            preparedStatement = connect().prepareStatement(selectCandidateId);
+            preparedStatement.setString(1, candidate.getName());
+            resultSet = preparedStatement.executeQuery();
             resultSet.next();
             int candidateId = resultSet.getInt(Const.CANDIDATES_ID);
 
-            PreparedStatement preparedStatement = connect().prepareStatement(insert);
+            preparedStatement = connect().prepareStatement(insert);
             preparedStatement.setInt(1, votingId);
             preparedStatement.setInt(2, candidateId);
             preparedStatement.setString(3, candidate.getName());
@@ -188,13 +197,9 @@ public class MySQL implements SQL {
 
             preparedStatement.executeUpdate();
         }
-        catch (SQLException e) {
-            // e.printStackTrace();
-        } 
-        catch (ClassNotFoundException e) {
-            // e.printStackTrace();
-        }
-        finally {
+        catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
             try {
                 dbConnection.close();
             } catch (SQLException e) {
@@ -208,29 +213,32 @@ public class MySQL implements SQL {
         String delete = "DELETE FROM " + Const.VOTING_CANDIDATES_LIST_TABLE + " WHERE " + Const.VOTING_CANDIDATE_LIST_CANDIDATENAME + " =? AND "
                 + Const.VOTING_CANDIDATE_LIST_VOTINGID + " =?";
     
+        String selectVotingId = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE " +
+                Const.VOTINGS_NAME + " =?";  
         try {
+            PreparedStatement preparedStatement;
             ResultSet resultSet;
             
-            resultSet = selectVoting(voting);
+            preparedStatement = connect().prepareStatement(selectVotingId);
+            preparedStatement.setString(1, voting.getTitle());
+            resultSet = preparedStatement.executeQuery();
             resultSet.next();
             int votingId = resultSet.getInt(Const.VOTINGS_ID);
 
-            PreparedStatement preparedStatement = connect().prepareStatement(delete);
-
+            preparedStatement = connect().prepareStatement(delete);
             preparedStatement.setString(1, candidate.getName());
             preparedStatement.setInt(2, votingId);
-
             preparedStatement.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             closeConnection();
         }
     }
 
     @Override
-    public ResultSet selectCandidate(Candidate candidate) {
+    public Candidate selectCandidate(Candidate candidate) {
+        Candidate selectedCandidate = null;
         ResultSet resultSet = null;
 
         String select = "SELECT * FROM " + Const.CANDIDATE_TABLE + " WHERE " + 
@@ -242,40 +250,57 @@ public class MySQL implements SQL {
             preparedStatement.setString(1, candidate.getName());
 
             resultSet = preparedStatement.executeQuery();
-        } catch (Exception e) {
+
+            selectedCandidate = new Candidate(resultSet.getString(Const.CANDIDATES_NAME));
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            closeConnection();
         }
 
-        return resultSet;
+        return selectedCandidate;
     }
 
     @Override
-    public ResultSet selectCandidatesList(Voting voting) {
+    public List<Candidate> selectCandidatesList(Voting voting) {
+        List<Candidate> candidates = new ArrayList<>();
         ResultSet resultSet = null;
        
         String select = "SELECT " + Const.VOTING_CANDIDATE_LIST_CANDIDATENAME + ", " + Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES + " FROM "
                 + Const.VOTING_CANDIDATES_LIST_TABLE + " WHERE " + Const.VOTING_CANDIDATE_LIST_VOTINGID + " =?";  
 
+        String selectVotingId = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE " +
+                Const.VOTINGS_NAME + " =?";  
+
         try {
-            resultSet = selectVoting(voting);
+            PreparedStatement preparedStatement;
+            preparedStatement = connect().prepareStatement(selectVotingId);
+            preparedStatement.setString(1, voting.getTitle());
+            resultSet = preparedStatement.executeQuery();
             resultSet.next();
             int votingId = resultSet.getInt(Const.VOTINGS_ID);
             
-            PreparedStatement preparedStatement = connect().prepareStatement(select);
+            preparedStatement = connect().prepareStatement(select);
             preparedStatement.setInt(1, votingId);
 
             resultSet = preparedStatement.executeQuery();
-        } catch (SQLException e) {
+            
+            while (resultSet.next()) {
+                candidates.add(new Candidate(resultSet.getString(Const.VOTING_CANDIDATE_LIST_CANDIDATENAME)));
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } finally {
+            closeConnection();
         }
 
-        return resultSet;
+        return candidates;
     }
 
     @Override
-    public ResultSet selectAdmin(Admin admin) {
+    public Admin selectAdmin(Admin admin) {
+        Admin selectedAdmin = null;
         ResultSet resultSet = null;
 
         String select = "SELECT * FROM " + Const.ADMIN_TABLE + " WHERE " + 
@@ -288,12 +313,15 @@ public class MySQL implements SQL {
                 preparedStatement.setString(2, admin.getPassword());
 
                 resultSet = preparedStatement.executeQuery();
-            } catch (SQLException e) {
+                resultSet.next();
+                selectedAdmin = new Admin(resultSet.getString(2), resultSet.getString(2), resultSet.getString(4));
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            } finally {
+                closeConnection();
             }
-        return resultSet;
+
+        return selectedAdmin;
     }
 
     @Override
@@ -308,6 +336,8 @@ public class MySQL implements SQL {
             preparedStatement.executeUpdate();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            closeConnection();
         }
     }
 
@@ -323,14 +353,14 @@ public class MySQL implements SQL {
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             closeConnection();
         }
     }
 
     @Override
-    public ResultSet selectVoting(Voting voting) {
+    public Voting selectVoting(Voting voting) {
+        Voting selectedVoting = null;
         ResultSet resultSet = null;
 
         String select = "SELECT * FROM " + Const.VOTING_TABLE + " WHERE " + 
@@ -342,29 +372,38 @@ public class MySQL implements SQL {
             preparedStatement.setString(1, voting.getTitle());
 
             resultSet = preparedStatement.executeQuery();
-        } catch (Exception e) {
+            resultSet.next();
+            selectedVoting = new Voting(resultSet.getString(Const.VOTINGS_NAME));
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            closeConnection();
         }
 
-        return resultSet;
+        return selectedVoting;
     }
 
     @Override
-    public ResultSet selectVotings() {
+    public List<Voting> selectVotings() {
+        List<Voting> votings = new ArrayList<>();
         ResultSet resultSet = null;
 
         String select = "SELECT * FROM " + Const.VOTING_TABLE;
         try {
             PreparedStatement preparedStatement = connect().prepareStatement(select);
-        
             resultSet = preparedStatement.executeQuery();
-        } catch (SQLException e) {
+            while (resultSet.next()) {
+                Voting voting = new Voting(resultSet.getString(Const.VOTINGS_NAME));
+                voting.setCandidates(selectCandidatesList(voting));
+                votings.add(voting);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } finally {
+            closeConnection();
         }
 
-        return resultSet;
+        return votings;
     }
 
 }

@@ -15,7 +15,7 @@
             "name": "VotingSytem",
             "request": "launch",
             "mainClass": "models.VotingSytem",
-            "projectName": "Voting System_4af2f5c1",
+            "projectName": "Voting-System_faa3f80e",
             "vmArgs": "--module-path D:/javafx-sdk-17.0.6/lib --add-modules javafx.controls,javafx.fxml"
         }
     ]
