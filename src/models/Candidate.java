@@ -6,6 +6,7 @@ public class Candidate {
 
     public Candidate(String name) {
         this.name = name;
+        voices = 0;
     }
 
     public void addVoice() {

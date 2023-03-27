@@ -4,8 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -57,7 +55,8 @@ public class AdminPanelController extends ControllerBase{
 
     private Voting selectedVoting;
     private Candidate selectedCandidate;
-    List<Voting> votings = DAO.selectVotings();
+    private List<Voting> votings = DAO.selectVotings();
+    private List<Candidate> candidates = DAO.selectAllCandidates();
 
     @FXML
     void initialize() {
@@ -72,82 +71,85 @@ public class AdminPanelController extends ControllerBase{
             addVoting();
         });
 
-        availableCandidatesList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-                if (availableCandidatesList.getSelectionModel().isEmpty()) {
-                    selectedCandidate = null;
-                } else {
-                    selectedCandidate = new Candidate(availableCandidatesList.getSelectionModel().getSelectedItem());
-                    deleteCandidateButton.setDisable(false);
-                    System.out.println(selectedCandidate.getName());
-                }
+        availableCandidatesList.setOnMouseClicked(event -> {
 
-                if (selectedVoting != null && selectedCandidate != null) {
-                    
-                    addCandidateToVotingButton.setDisable(false);
-
-                    addCandidateToVotingButton.setOnAction(event -> {
-                        if (!votingCandidatesList.getItems().contains(selectedCandidate.getName())) {
-                            DAO.insertCandidateToVotingList(selectedVoting, selectedCandidate);
-                            loadListOfCandidates();
-                        } else {
-                            System.out.println("Already added");
-                        }
-                    });
-                } else {
-                    addCandidateToVotingButton.setDisable(true);
-                }
+            deleteCandidateButton.disableProperty().bind(availableCandidatesList.getSelectionModel().selectedItemProperty().isNull());
+            addCandidateToVotingButton.disableProperty().bind(availableCandidatesList.getSelectionModel().selectedItemProperty().isNull());
+            if (!availableCandidatesList.getSelectionModel().isEmpty()) {
+                selectedCandidate = candidates.get(availableCandidatesList.getSelectionModel().getSelectedIndex());
+                System.out.println(selectedCandidate.getName());
             }
+
         });
 
         deleteCandidateButton.setOnAction(event -> {
             DAO.deleteCandidate(selectedCandidate);
+            candidates.remove(selectedCandidate);
             availableCandidatesList.getItems().remove(selectedCandidate.getName());
-            deleteCandidateButton.setDisable(true);
-        });
-
-        votingsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-
-            @Override
-            public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-                if (votingsList.getSelectionModel().isEmpty()) {
-                    selectedVoting = null;
-                    votingCandidatesList.getItems().clear();
-                } else {
-                    selectedVoting = new Voting(votingsList.getSelectionModel().getSelectedItem());
-                }
-
-                if (selectedVoting != null) {
-                    loadListOfCandidates();
-                    System.out.println(selectedVoting.getTitle());
+            
+            for (Voting voting : votings) {
+                if (voting.getCandidates().contains(selectedCandidate)) {
+                    voting.deleteCandidate(selectedCandidate);
                 }
             }
             
+            if (!availableCandidatesList.getSelectionModel().isEmpty()) {
+                selectedCandidate = candidates.get(availableCandidatesList.getSelectionModel().getSelectedIndex());
+                System.out.println(selectedCandidate.getName());
+            }
+
         });
 
-        votingCandidatesList.setOnMouseClicked(event -> {
-            if (votingCandidatesList.getSelectionModel().isEmpty()) {
-                deleteCandidateFromVotingButton.setDisable(true);
-            } else {
-                deleteCandidateFromVotingButton.setDisable(false);
-                selectedCandidate = new Candidate(votingCandidatesList.getSelectionModel().getSelectedItem());
+        addCandidateToVotingButton.setOnAction(evennt -> {
+            if (selectedCandidate != null && selectedVoting != null) {
+                DAO.insertCandidateToVotingList(selectedVoting, selectedCandidate);
+                votingCandidatesList.getItems().add(selectedCandidate.getName());
+                selectedVoting.addCandidate(selectedCandidate);
             }
         });
 
-        
+        votingsList.setOnMouseClicked(event -> {
+            deleteVotingButton.disableProperty().bind(votingsList.getSelectionModel().selectedItemProperty().isNull());
+            selectedVoting = votings.get(votingsList.getSelectionModel().getSelectedIndex());
+            System.out.println(selectedVoting.getTitle());
+            if (selectedVoting != null && selectedVoting.getCandidates() != null) {
+                List<String> candidatesNames = new ArrayList<>();
+
+                for (Candidate candidate : selectedVoting.getCandidates()) {
+                    candidatesNames.add(candidate.getName());
+                }
+
+                votingCandidatesList.getItems().setAll(candidatesNames);
+            } else {
+                votingCandidatesList.getItems().clear();
+            }
+        });
+
+        deleteVotingButton.setOnAction(event -> {
+            DAO.deleteVoting(selectedVoting);
+            votingsList.getItems().remove(selectedVoting.getTitle());
+            votings.remove(selectedVoting);
+            votingCandidatesList.getItems().clear();
+        });
+
+        votingCandidatesList.setOnMouseClicked(event -> {
+            selectedCandidate = selectedVoting.getCandidates().get(votingCandidatesList.getSelectionModel().getSelectedIndex());
+            System.out.println(selectedCandidate.getName());
+            deleteCandidateFromVotingButton.disableProperty().bind(votingCandidatesList.getSelectionModel().selectedItemProperty().isNull());
+        });
 
         deleteCandidateFromVotingButton.setOnAction(event -> {
             DAO.deleteCandidateFromVotingList(selectedVoting, selectedCandidate);
             votingCandidatesList.getItems().remove(selectedCandidate.getName());
-            deleteCandidateFromVotingButton.setDisable(true);
+            selectedVoting.deleteCandidate(selectedCandidate);
         });
-
+    
     }
 
     private void addCandidate() {
         Candidate candidate = new Candidate(candidateNameField.getText());
         DAO.insertCandidate(candidate);
+        candidates.add(candidate);
         availableCandidatesList.getItems().add(candidate.getName());
         availableCandidatesList.scrollTo(candidate.getName());
         availableCandidatesList.getSelectionModel().select(candidate.getName());
@@ -156,6 +158,7 @@ public class AdminPanelController extends ControllerBase{
     private void addVoting() {
         Voting voting = new Voting(votingTitleField.getText());
         DAO.insertVoting(voting);
+        votings.add(voting);
         votingsList.getItems().add(voting.getTitle());
         votingsList.scrollTo(voting.getTitle());
         votingsList.getSelectionModel().select(voting.getTitle());
@@ -178,29 +181,14 @@ public class AdminPanelController extends ControllerBase{
         availableCandidatesList.getItems().setAll(candidates);
     }
 
-    private void loadListOfCandidates() {
-        List<String> candidates = new ArrayList<>();
+    // private void loadListOfCandidates() {
+    //     List<String> candidates = new ArrayList<>();
 
-        for (Candidate candidate : DAO.selectCandidatesList(selectedVoting)) {
-            candidates.add(candidate.getName());
-        }
-
-        votingCandidatesList.getItems().setAll(candidates);
-    }
-
-    // private void showListViewElements(ListView<String> listView, ResultSet resultSet, String column) {
-    //     List<String> values = new ArrayList<>();
-
-    //     try {
-    //         while (resultSet.next()) {
-    //             values.add(resultSet.getString(column));
-    //         }
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
+    //     for (Candidate candidate : DAO.selectCandidatesList(selectedVoting)) {
+    //         candidates.add(candidate.getName());
     //     }
 
-    //     DAO.closeConnection();
-    //     listView.getItems().setAll(values);
-    // } 
+    //     votingCandidatesList.getItems().setAll(candidates);
+    // }
 
 }

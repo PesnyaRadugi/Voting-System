@@ -29,7 +29,7 @@ public class Const {
 
     // Voting candidates list table
     public static final String VOTING_CANDIDATES_LIST_TABLE = "voting_candidates_list";
-    public static final String VOTING_CANDIDATE_LIST_VOTINGID = "votingid";
+    public static final String VOTING_CANDIDATE_LIST_VOTINGID = "idvotings";
     public static final String VOTING_CANDIDATE_LIST_CANDIDATEID = "candidateid";
     public static final String VOTING_CANDIDATE_LIST_CANDIDATENAME = "candidatename";
     public static final String VOTING_CANDIDATE_LIST_CANDIDATE_VOICES = "voices";    

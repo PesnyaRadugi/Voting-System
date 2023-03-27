@@ -28,14 +28,12 @@ public class Voting {
         return candidates;
     }
 
-    public List<String> getCandidatesNames() {
-        List<String> candidatesNames = new ArrayList<>();
+    public void addCandidate(Candidate candidate) {
+        candidates.add(candidate);
+    }
 
-        for (Candidate candidate : candidates) {
-            candidatesNames.add(candidate.getName());
-        }
-
-        return candidatesNames;
+    public void deleteCandidate(Candidate candidate) {
+        candidates.remove(candidate);
     }
 
     public void setCandidates(List<Candidate> candidates) {

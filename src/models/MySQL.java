@@ -343,13 +343,28 @@ public class MySQL implements SQL {
 
     @Override
     public void deleteVoting(Voting voting) {
-        String delete = "DELETE FROM " + Const.VOTING_TABLE + " WHERE " + Const.VOTINGS_NAME + " =?";
+        String delete1 = "DELETE FROM " + Const.VOTING_TABLE + " WHERE " + Const.VOTINGS_ID + " =?";
+        String delete2 = "DELETE FROM " + Const.VOTING_CANDIDATES_LIST_TABLE + " WHERE " + Const.VOTING_CANDIDATE_LIST_VOTINGID + " =?";
+
+        String selectVotingId = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE " +
+                Const.VOTINGS_NAME + " =?";  
 
         try {
-            PreparedStatement preparedStatement = connect().prepareStatement(delete);
-
+            PreparedStatement preparedStatement;
+            ResultSet resultSet;  
+            
+            preparedStatement = connect().prepareStatement(selectVotingId);
             preparedStatement.setString(1, voting.getTitle());
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            int votingId = resultSet.getInt(Const.VOTINGS_ID);
 
+            preparedStatement = connect().prepareStatement(delete1);
+            preparedStatement.setInt(1, votingId);
+            preparedStatement.executeUpdate();
+
+            preparedStatement = connect().prepareStatement(delete2);
+            preparedStatement.setInt(1, votingId);
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
