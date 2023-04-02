@@ -136,6 +136,7 @@ public class AdminPanelController extends ControllerBase{
             selectedCandidate = selectedVoting.getCandidates().get(votingCandidatesList.getSelectionModel().getSelectedIndex());
             System.out.println(selectedCandidate.getName());
             deleteCandidateFromVotingButton.disableProperty().bind(votingCandidatesList.getSelectionModel().selectedItemProperty().isNull());
+            System.out.println(selectedCandidate.getVoices());
         });
 
         deleteCandidateFromVotingButton.setOnAction(event -> {

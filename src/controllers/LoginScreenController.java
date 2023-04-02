@@ -8,6 +8,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import models.Const;
 import models.User;
+import models.VotingSytem;
 
 public class LoginScreenController extends ControllerBase {
 
@@ -65,6 +66,7 @@ public class LoginScreenController extends ControllerBase {
             user.setPassword(loginPassword);
 
             if (DAO.selectUser(user) != null) {
+                VotingSytem.currentUser = DAO.selectUser(user);
                 System.out.println("HUGE SUCCES");
                 switchScene(loginButton, Const.HOMEPAGE);
             }

@@ -6,6 +6,7 @@ import java.util.List;
 public class Voting {
     private String title;
     private List<Candidate> candidates = new ArrayList<>();
+    private List<Elector> participants;
 
     public Voting(String title, List<Candidate> candidates) {
         this.title = title;

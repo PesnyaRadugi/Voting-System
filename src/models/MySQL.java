@@ -165,33 +165,12 @@ public class MySQL implements SQL {
     public void insertCandidateToVotingList(Voting voting, Candidate candidate) {
         String insert = "INSERT INTO " + Const.VOTING_CANDIDATES_LIST_TABLE + " (" +
                 Const.VOTING_CANDIDATE_LIST_VOTINGID + "," + Const.VOTING_CANDIDATE_LIST_CANDIDATEID + ","
-                + Const.VOTING_CANDIDATE_LIST_CANDIDATENAME + "," + Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES + ") VALUES(?,?,?,?)";
-        
-        String selectVotingId = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE " +
-                Const.VOTINGS_NAME + " =?";    
-
-        String selectCandidateId = "SELECT " + Const.CANDIDATES_ID + " FROM " + Const.CANDIDATE_TABLE + " WHERE " +
-                Const.CANDIDATES_NAME + " =?";       
+                + Const.VOTING_CANDIDATE_LIST_CANDIDATENAME + "," + Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES + ") VALUES(?,?,?,?)";  
         
         try {
-            PreparedStatement preparedStatement;
-            ResultSet resultSet;  
-            
-            preparedStatement = connect().prepareStatement(selectVotingId);
-            preparedStatement.setString(1, voting.getTitle());
-            resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            int votingId = resultSet.getInt(Const.VOTINGS_ID);
-
-            preparedStatement = connect().prepareStatement(selectCandidateId);
-            preparedStatement.setString(1, candidate.getName());
-            resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            int candidateId = resultSet.getInt(Const.CANDIDATES_ID);
-
-            preparedStatement = connect().prepareStatement(insert);
-            preparedStatement.setInt(1, votingId);
-            preparedStatement.setInt(2, candidateId);
+            PreparedStatement preparedStatement = connect().prepareStatement(insert);
+            preparedStatement.setInt(1, getVotingId(voting));
+            preparedStatement.setInt(2, getCandidateId(candidate));
             preparedStatement.setString(3, candidate.getName());
             preparedStatement.setInt(4, candidate.getVoices());
 
@@ -212,22 +191,11 @@ public class MySQL implements SQL {
     public void deleteCandidateFromVotingList(Voting voting, Candidate candidate) {
         String delete = "DELETE FROM " + Const.VOTING_CANDIDATES_LIST_TABLE + " WHERE " + Const.VOTING_CANDIDATE_LIST_CANDIDATENAME + " =? AND "
                 + Const.VOTING_CANDIDATE_LIST_VOTINGID + " =?";
-    
-        String selectVotingId = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE " +
-                Const.VOTINGS_NAME + " =?";  
-        try {
-            PreparedStatement preparedStatement;
-            ResultSet resultSet;
-            
-            preparedStatement = connect().prepareStatement(selectVotingId);
-            preparedStatement.setString(1, voting.getTitle());
-            resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            int votingId = resultSet.getInt(Const.VOTINGS_ID);
 
-            preparedStatement = connect().prepareStatement(delete);
+        try {
+            PreparedStatement preparedStatement = connect().prepareStatement(delete);
             preparedStatement.setString(1, candidate.getName());
-            preparedStatement.setInt(2, votingId);
+            preparedStatement.setInt(2, getVotingId(voting));
             preparedStatement.executeUpdate();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -267,26 +235,16 @@ public class MySQL implements SQL {
         ResultSet resultSet = null;
        
         String select = "SELECT " + Const.VOTING_CANDIDATE_LIST_CANDIDATENAME + ", " + Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES + " FROM "
-                + Const.VOTING_CANDIDATES_LIST_TABLE + " WHERE " + Const.VOTING_CANDIDATE_LIST_VOTINGID + " =?";  
-
-        String selectVotingId = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE " +
-                Const.VOTINGS_NAME + " =?";  
+                + Const.VOTING_CANDIDATES_LIST_TABLE + " WHERE " + Const.VOTING_CANDIDATE_LIST_VOTINGID + " =?";
 
         try {
-            PreparedStatement preparedStatement;
-            preparedStatement = connect().prepareStatement(selectVotingId);
-            preparedStatement.setString(1, voting.getTitle());
-            resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            int votingId = resultSet.getInt(Const.VOTINGS_ID);
-            
-            preparedStatement = connect().prepareStatement(select);
-            preparedStatement.setInt(1, votingId);
+            PreparedStatement preparedStatement = connect().prepareStatement(select);
+            preparedStatement.setInt(1, getVotingId(voting));
 
             resultSet = preparedStatement.executeQuery();
             
             while (resultSet.next()) {
-                candidates.add(new Candidate(resultSet.getString(Const.VOTING_CANDIDATE_LIST_CANDIDATENAME)));
+                candidates.add(new Candidate(resultSet.getString(Const.VOTING_CANDIDATE_LIST_CANDIDATENAME), resultSet.getInt(Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES)));
             }
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -389,6 +347,7 @@ public class MySQL implements SQL {
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             selectedVoting = new Voting(resultSet.getString(Const.VOTINGS_NAME));
+            selectedVoting.setCandidates(selectCandidatesList(voting));
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
@@ -419,6 +378,50 @@ public class MySQL implements SQL {
         }
 
         return votings;
+    }
+
+    @Override
+    public int getCandidateId(Candidate candidate) {
+        ResultSet resultSet = null;
+
+        String select = "SELECT " + Const.CANDIDATES_ID + " FROM " + Const.CANDIDATE_TABLE + " WHERE "
+        + Const.CANDIDATES_NAME + " =?";  
+
+        try {
+            PreparedStatement preparedStatement = connect().prepareStatement(select);
+            preparedStatement.setString(1, candidate.getName());
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            int candidateId = resultSet.getInt(Const.CANDIDATES_ID);
+            return candidateId;
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getVotingId(Voting voting) {
+        ResultSet resultSet = null;
+
+        String select = "SELECT " + Const.VOTINGS_ID + " FROM " + Const.VOTING_TABLE + " WHERE "
+        + Const.VOTINGS_NAME + " =?";  
+
+        try {
+            PreparedStatement preparedStatement = connect().prepareStatement(select);
+            preparedStatement.setString(1, voting.getTitle());
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            int votingId = resultSet.getInt(Const.VOTINGS_ID);
+            return votingId;
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+        return 0;
     }
 
 }
