@@ -10,6 +10,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import models.Candidate;
 import models.Voting;
+import models.VotingSytem;
 
 public class AdminPanelController extends ControllerBase{
 
@@ -51,6 +52,9 @@ public class AdminPanelController extends ControllerBase{
 
     @FXML
     private Button deleteVotingButton;
+
+    @FXML
+    private Button setVotingAsActiveButton;
 
 
     private Voting selectedVoting;
@@ -110,6 +114,7 @@ public class AdminPanelController extends ControllerBase{
 
         votingsList.setOnMouseClicked(event -> {
             deleteVotingButton.disableProperty().bind(votingsList.getSelectionModel().selectedItemProperty().isNull());
+            setVotingAsActiveButton.disableProperty().bind(votingsList.getSelectionModel().selectedItemProperty().isNull());
             selectedVoting = votings.get(votingsList.getSelectionModel().getSelectedIndex());
             System.out.println(selectedVoting.getTitle());
             if (selectedVoting != null && selectedVoting.getCandidates() != null) {

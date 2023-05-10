@@ -27,6 +27,11 @@ public class Const {
     public static final String VOTINGS_ID = "idvotings";
     public static final String VOTINGS_NAME = "name";
 
+    // Current voting
+    public static final String CURRENT_VOTING_TABLE = "current_voting";
+    public static final String CURRENT_VOTING_ID = "idcurrent_voting";
+    public static final String CURRENT_VOTING_NAME = "name";
+
     // Voting candidates list table
     public static final String VOTING_CANDIDATES_LIST_TABLE = "voting_candidates_list";
     public static final String VOTING_CANDIDATE_LIST_VOTINGID = "idvotings";

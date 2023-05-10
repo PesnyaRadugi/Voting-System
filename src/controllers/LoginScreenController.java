@@ -66,7 +66,8 @@ public class LoginScreenController extends ControllerBase {
             user.setPassword(loginPassword);
 
             if (DAO.selectUser(user) != null) {
-                VotingSytem.currentUser = DAO.selectUser(user);
+                VotingSytem.VOTING_SYTEM.setCurrentUser(DAO.selectUser(user));
+                // VotingSytem.currentUser = DAO.selectUser(user);
                 System.out.println("HUGE SUCCES");
                 switchScene(loginButton, Const.HOMEPAGE);
             }

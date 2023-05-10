@@ -43,17 +43,24 @@ public class HomepageController extends ControllerBase {
 
     @FXML
     void initialize() {
-
         loadVotings();
+
+        if (VotingSytem.VOTING_SYTEM.getCurrentVoting() != null) {
+            voteButton.setDisable(false);
+        }
 
         exitButton.setOnAction(event -> {
             switchScene(menuButton, Const.LOGIN_SCREEN);
-            VotingSytem.currentUser = null;
+            VotingSytem.VOTING_SYTEM.setCurrentUser(null);
+            // VotingSytem.currentUser = null;
         });
 
         votingsListView.setOnMouseClicked(event -> {
-            selectedVoting = votings.get(votingsListView.getSelectionModel().getSelectedIndex());
-            loadCandidates();
+            if (!votingsListView.getSelectionModel().isEmpty()) {
+                selectedVoting = votings.get(votingsListView.getSelectionModel().getSelectedIndex());
+                loadCandidates();
+                System.out.println(VotingSytem.VOTING_SYTEM.getCurrentUser().getName());
+            }
         });
 
         candidatesListView.setOnMouseClicked(even -> {
@@ -61,9 +68,6 @@ public class HomepageController extends ControllerBase {
                 selectedCandidate = selectedVoting.getCandidates().get(candidatesListView.getSelectionModel().getSelectedIndex());
                 System.out.println(selectedCandidate.getName() + " voices: " + selectedCandidate.getVoices());
             }
-
-            voteButton.disableProperty().bind(candidatesListView.getSelectionModel().selectedItemProperty().isNull());
-            voteMenacinglyButton.disableProperty().bind(candidatesListView.getSelectionModel().selectedItemProperty().isNull());
         });
         
     }

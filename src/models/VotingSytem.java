@@ -8,8 +8,9 @@ import javafx.stage.Stage;
  
 public class VotingSytem extends Application {
 
-    public static Voting CurrentVoting;
-    public static User currentUser;
+    public static final VotingSytem VOTING_SYTEM = new VotingSytem();
+    private Voting currentVoting;
+    private User currentUser;
 
 
     public static void main(String[] args) {
@@ -24,6 +25,22 @@ public class VotingSytem extends Application {
         stage.setTitle("Voting System");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    public void setCurrentVoting(Voting currentVoting) {
+        this.currentVoting = currentVoting;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public Voting getCurrentVoting() {
+        return currentVoting;
     }
 
 }
