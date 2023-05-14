@@ -6,9 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
  
-public class VotingSytem extends Application {
+public class VotingSystem extends Application {
 
-    public static final VotingSytem VOTING_SYTEM = new VotingSytem();
+    public static final VotingSystem VOTING_SYSTEM = new VotingSystem();
     private Voting currentVoting;
     private User currentUser;
 

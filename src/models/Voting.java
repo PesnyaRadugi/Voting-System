@@ -18,7 +18,6 @@ public class Voting {
 
     public Voting(String title) {
         this.title = title;
-        candidates = null;
     }
 
     public String getTitle() {

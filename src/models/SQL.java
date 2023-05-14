@@ -17,12 +17,14 @@ public interface SQL {
     public void insertUser(User user);
     public void deleteUser(User user);
     public User selectUser(User user);
+    public int getUserId(User user);
 
     public void insertCandidate(Candidate candidate);
     public void deleteCandidate(Candidate candidate);
     public int getCandidateId(Candidate candidate);
     public Candidate selectCandidate(Candidate candidate);
     public List<Candidate> selectAllCandidates();
+    public void addVoiceToCandidate(Candidate candidate);
 
     public void insertVoting(Voting voting);
     public void deleteVoting(Voting voting);
@@ -34,4 +36,7 @@ public interface SQL {
     public List<Candidate> selectCandidatesList(Voting voting);
     
     public Admin selectAdmin(Admin admin);
+
+    public void insertParticipant(User user, Voting voting);
+    public boolean votingHasParticipant(Voting voting, User user);
 }

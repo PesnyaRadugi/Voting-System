@@ -11,7 +11,7 @@ import javafx.scene.control.MenuItem;
 import models.Candidate;
 import models.Const;
 import models.Voting;
-import models.VotingSytem;
+import models.VotingSystem;
 
 public class HomepageController extends ControllerBase {
 
@@ -26,9 +26,9 @@ public class HomepageController extends ControllerBase {
 
     @FXML
     private MenuItem profileButton;
-
+    
     @FXML
-    private Button voteButton;
+    private Button joinVotingButton;
 
     @FXML
     private Button voteMenacinglyButton;
@@ -45,21 +45,23 @@ public class HomepageController extends ControllerBase {
     void initialize() {
         loadVotings();
 
-        if (VotingSytem.VOTING_SYTEM.getCurrentVoting() != null) {
-            voteButton.setDisable(false);
-        }
+        // TO DO, probably.
+        // if (VotingSytem.VOTING_SYTEM.getCurrentVoting() != null) {
+        //     joinVotingButton.setDisable(false);
+        // }
 
         exitButton.setOnAction(event -> {
             switchScene(menuButton, Const.LOGIN_SCREEN);
-            VotingSytem.VOTING_SYTEM.setCurrentUser(null);
+            VotingSystem.VOTING_SYSTEM.setCurrentUser(null);
             // VotingSytem.currentUser = null;
         });
 
         votingsListView.setOnMouseClicked(event -> {
             if (!votingsListView.getSelectionModel().isEmpty()) {
                 selectedVoting = votings.get(votingsListView.getSelectionModel().getSelectedIndex());
+                VotingSystem.VOTING_SYSTEM.setCurrentVoting(selectedVoting);
                 loadCandidates();
-                System.out.println(VotingSytem.VOTING_SYTEM.getCurrentUser().getName());
+                System.out.println(VotingSystem.VOTING_SYSTEM.getCurrentUser().getName());
             }
         });
 
@@ -69,7 +71,18 @@ public class HomepageController extends ControllerBase {
                 System.out.println(selectedCandidate.getName() + " voices: " + selectedCandidate.getVoices());
             }
         });
-        
+
+        voteMenacinglyButton.disableProperty().bind(candidatesListView.getSelectionModel().selectedItemProperty().isNull());
+        voteMenacinglyButton.setOnAction(event -> {
+            if (!DAO.votingHasParticipant(selectedVoting, VotingSystem.VOTING_SYSTEM.getCurrentUser())) {
+                DAO.insertParticipant(VotingSystem.VOTING_SYSTEM.getCurrentUser(), selectedVoting);
+                DAO.addVoiceToCandidate(selectedCandidate);
+                selectedCandidate.addVoice();
+                System.out.println("Succesfully voted!");
+            } else {
+                System.out.println("Already voted!");
+            }
+        });
     }
 
     private void loadVotings() {
@@ -89,12 +102,6 @@ public class HomepageController extends ControllerBase {
         }
 
         candidatesListView.getItems().setAll(candidatesNames);
-
-        // for (Candidate candidate : DAO.selectAllCandidates()) {
-        //     candidates.add(candidate.getName());
-        // }
-
-        // candidatesListView.getItems().setAll(candidates);
     }
 
 }

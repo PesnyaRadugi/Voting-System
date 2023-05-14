@@ -46,9 +46,12 @@ public class Const {
     public static final String ADMIN_LOGIN_SCREEN = "/views/AdminLoginScreen.fxml";
     public static final String REGISTRATION_SCREEN = "/views/RegistrationScreen.fxml";
     public static final String NEW_CANDIDATE_PAGE = "/views/NewCandidatePage.fxml";
-    // public static final String "/views/.fxml";
-    // public static final String "/views/.fxml";
-    // public static final String "/views/.fxml";
+
+
+    public static final String VOTING_PARTICIPANTS_TABLE = "voting_panticipants";
+    public static final String VOTING_PARTICIPANTS_LIST_ID = "id";
+    public static final String VOTING_PARTICIPANT_ID = "user_id";
+    public static final String VOTING_PARTICIPANT_VOTING = "voting_id";
     // public static final String "/views/.fxml";
     // public static final String "/views/.fxml";
     // public static final String "/views/.fxml";

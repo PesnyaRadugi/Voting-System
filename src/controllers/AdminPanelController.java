@@ -10,7 +10,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import models.Candidate;
 import models.Voting;
-import models.VotingSytem;
 
 public class AdminPanelController extends ControllerBase{
 
@@ -154,6 +153,7 @@ public class AdminPanelController extends ControllerBase{
 
     private void addCandidate() {
         Candidate candidate = new Candidate(candidateNameField.getText());
+        candidateNameField.clear();
         DAO.insertCandidate(candidate);
         candidates.add(candidate);
         availableCandidatesList.getItems().add(candidate.getName());
@@ -163,6 +163,7 @@ public class AdminPanelController extends ControllerBase{
 
     private void addVoting() {
         Voting voting = new Voting(votingTitleField.getText());
+        votingTitleField.clear();
         DAO.insertVoting(voting);
         votings.add(voting);
         votingsList.getItems().add(voting.getTitle());

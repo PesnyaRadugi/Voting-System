@@ -95,6 +95,27 @@ public class MySQL implements SQL {
         
     }
 
+    public int getUserId(User user) {
+        ResultSet resultSet = null;
+        int userId = -1;
+        String select = "SELECT " + Const.USERS_ID + " FROM " + Const.USER_TABLE + " WHERE "
+        + Const.USERS_NAME + " =?"; 
+        
+        try {
+            PreparedStatement preparedStatement = connect().prepareStatement(select);
+
+            preparedStatement.setString(1, user.getName());
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            userId = resultSet.getInt(Const.USERS_ID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+        return userId;
+    }
+
     @Override
     public void insertCandidate(Candidate candidate) {
         String insert = "INSERT INTO " + Const.CANDIDATE_TABLE + "(" +
@@ -257,6 +278,25 @@ public class MySQL implements SQL {
     }
 
     @Override
+    public void addVoiceToCandidate(Candidate candidate) {
+        String update = "UPDATE " + Const.VOTING_CANDIDATES_LIST_TABLE + " SET " +
+            Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES + " = " + Const.VOTING_CANDIDATE_LIST_CANDIDATE_VOICES +
+            " + 1 WHERE " + Const.VOTING_CANDIDATE_LIST_CANDIDATEID + " =? AND " + Const.VOTING_CANDIDATE_LIST_VOTINGID + " =?";
+
+        try {
+            PreparedStatement preparedStatement = connect().prepareStatement(update);
+            preparedStatement.setInt(1, getCandidateId(candidate));
+            preparedStatement.setInt(2, getVotingId(VotingSystem.VOTING_SYSTEM.getCurrentVoting()));
+
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
     public Admin selectAdmin(Admin admin) {
         Admin selectedAdmin = null;
         ResultSet resultSet = null;
@@ -285,7 +325,7 @@ public class MySQL implements SQL {
     @Override
     public void insertVoting(Voting voting) {
         String insert = "INSERT INTO " + Const.VOTING_TABLE + "(" +
-            Const.VOTINGS_NAME + ") VALUES(?)" ;
+            Const.VOTINGS_NAME + ") VALUES(?)";
 
         try {
             PreparedStatement preparedStatement = connect().prepareStatement(insert);
@@ -422,6 +462,47 @@ public class MySQL implements SQL {
             closeConnection();
         }
         return 0;
+    }
+
+    @Override
+    public void insertParticipant(User user, Voting voting) {
+        String insert = "INSERT INTO " + Const.VOTING_PARTICIPANTS_TABLE + "(" +
+            Const.VOTING_PARTICIPANT_ID + "," + Const.VOTING_PARTICIPANT_VOTING + ") VALUES(?,?)";
+    
+        try {
+            PreparedStatement preparedStatement = connect().prepareStatement(insert);
+            preparedStatement.setInt(1, getUserId(user));
+            preparedStatement.setInt(2, getVotingId(voting));
+            
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public boolean votingHasParticipant(Voting voting, User user) {
+        ResultSet resultSet = null;
+
+        String select = "SELECT * FROM " + Const.VOTING_PARTICIPANTS_TABLE + " WHERE " +
+            Const.VOTING_PARTICIPANT_ID + "=? AND " + Const.VOTING_PARTICIPANT_VOTING + "=?";
+
+        try {
+            PreparedStatement preparedStatement = connect().prepareStatement(select);
+            preparedStatement.setInt(1, getUserId(user));
+            preparedStatement.setInt(2, getVotingId(voting));
+            
+            resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+
+        return false;
     }
 
 }
